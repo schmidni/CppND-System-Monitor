@@ -84,8 +84,8 @@ std::string LinuxParser::GetValueFromKey(std::string filename,
 }
 
 // Helper: return nth word of a string
-std::string LinuxParser::GetNthWord(std::string s, std::size_t n) {
-  std::istringstream linestream(s);
+std::string LinuxParser::GetNthWord(std::istringstream &linestream, std::size_t n) {
+  string s;
   while (n-- > 0 && (linestream >> s))
     ;
   return s;
@@ -196,7 +196,8 @@ long LinuxParser::UpTime(int pid) {
                        kStatFilename);
   if (stream.is_open()) {
     std::getline(stream, line);
-    ticks = std::stol(GetNthWord(line, 22));
+    std::istringstream linestream(line);
+    ticks = std::stol(GetNthWord(linestream, 22));
   }
   uptime = ticks / sysconf(_SC_CLK_TCK);
   uptime = UpTime() - uptime;
@@ -212,19 +213,14 @@ float LinuxParser::CpuUtilization(int pid) {
                        kStatFilename);
   if (stream.is_open()) {
     std::getline(stream, line);
-
     std::istringstream linestream(line);
 
     // drop 13 words from the stream
-    size_t n = 13;
-    while (n-- > 0 && (linestream >> line))
-      ;
+    GetNthWord(linestream, 13);
     // read cpu stats
     linestream >> utime >> stime >> cutime >> cstime;
     // drop 4 more words
-    n = 4;
-    while (n-- > 0 && (linestream >> line))
-      ;
+    GetNthWord(linestream, 4);
     // next one is starttime
     linestream >> starttime;
   }

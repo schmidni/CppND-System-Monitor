@@ -29,7 +29,7 @@ std::string Kernel();
 
 // Helper
 std::string GetValueFromKey(std::string filename, std::string key);
-std::string GetNthWord(std::string s, std::size_t n);
+std::string GetNthWord(std::istringstream &linestream, std::size_t n);
 
 // CPU
 std::vector<int> CpuUtilization();
